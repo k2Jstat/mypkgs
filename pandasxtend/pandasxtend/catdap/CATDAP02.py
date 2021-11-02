@@ -101,7 +101,9 @@ class CATDAP02():
                     p_list.extend([100])
 
                     q_list = [np.percentile(DF_nmiss[feature],q) for q in p_list]
-
+                    q_list = list(set(q_list))
+                    q_list.sort()
+                    
                     if X_bin_closed == "left":
                         #print("left")
                         q_list[-1] = q_list[-1] + 1
@@ -250,7 +252,7 @@ class CATDAP02():
                 base["feature_name_" + str(i + 1)] = feature_select[i]
             
             for i in range(len(feature_select)):
-                base["missing_rate_of_feature_" + str(i + 1)] = missing_rate_dict["feature_" + str(i + 1)]
+                base["missing_ratio_of_the_feature_" + str(i + 1)] = missing_rate_dict["feature_" + str(i + 1)]
 
             base["AIC"] = round(AIC_CAT,5)
             AIC_table = pd.concat([base,output_cross_table2.reset_index()],axis = 1)

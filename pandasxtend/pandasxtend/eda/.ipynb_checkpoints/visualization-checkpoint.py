@@ -8,15 +8,23 @@ __all__ = [
     "AllPlot"
 ]
 class AllPlot():
-    def __init__(self,df,yoko=3,bins_ = None,adj_parametor = 1e-10):
-        col_numeric = [col_ for col_ in df.columns if (df[col_].dtype != "O") & (df[col_].dtype.str.find("[ns]") == -1)]
-        col_strings = [col_ for col_ in df.columns if (df[col_].dtype == "O")]
-        col_datetime = [col_ for col_ in df.columns if (df[col_].dtype.str.find("[ns]") > -1)]
+    def __init__(self,df,yoko=3,bins_ = None,sample_size = None,adj_parametor = 1e-10):
+        
+        if sample_size == None:
+            df_sample = df.copy()
+        else :
+            df_sample = df.sample(n=sample_size,random_state = 71).copy()
+            df_sample.reset_index(inplace = True,drop = True)
+            
+        col_numeric = [col_ for col_ in df_sample.columns if (df_sample[col_].dtype != "O") & (df_sample[col_].dtype.str.find("[ns]") == -1)]
+        col_strings = [col_ for col_ in df_sample.columns if (df_sample[col_].dtype == "O")]
+        col_datetime = [col_ for col_ in df_sample.columns if (df_sample[col_].dtype.str.find("[ns]") > -1)]
+
         if bins_ == None:
             #sturges
-            bins_ = int(round(np.log2(df.shape[0]) + 1,0)) 
+            bins_ = int(round(np.log2(df_sample.shape[0]) + 1,0)) 
             
-        self.df = df
+        self.df = df_sample
         self.col_numeric = col_numeric
         self.col_strings = col_strings
         self.col_datetime = col_datetime
@@ -184,17 +192,17 @@ class AllPlot():
             for j,col_str in enumerate(col_strings):          
                 try:
                     if tate == 1:
-                        ax[j].grid(axis = "y")
+                        #ax[j].grid(axis = "y")
                         sns.boxplot(x = col_str,y = col_num,data = df,ax = ax[j])
                         ax[j].set_title(col_num + " by " + col_str)
 
                     elif yoko == 1:
-                        ax[i].grid(axis = "y")
+                        #ax[i].grid(axis = "y")
                         sns.boxplot(x = col_str,y = col_num,data = df,ax = ax[i])
                         ax[i].set_title(col_num + " by " + col_str)
 
                     else :
-                        ax[i][j].grid(axis = "y")
+                        #ax[i][j].grid(axis = "y")
                         sns.boxplot(x = col_str,y = col_num,data = df,ax = ax[i][j])
                         ax[i][j].set_title(col_num + " by " + col_str)
 

@@ -24,7 +24,7 @@ console_scripts = [
 
 setup(
     name='pandasxtend',
-    version='0.0.2',
+    version='0.0.3',
     packages=packages,
     #install_requires=install_requires,
     entry_points={'console_scripts': console_scripts},

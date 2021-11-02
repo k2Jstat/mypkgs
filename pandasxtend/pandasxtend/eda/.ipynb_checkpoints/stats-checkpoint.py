@@ -16,7 +16,7 @@ class KL_Divergence():
             #sturges
             bins_ = int(round(np.log2(df.shape[0]) + 1,0)) 
             
-        self.df = df
+        self.df = df.copy()
         self.binary_columns = binary_columns
         self.base_label = base_label
         self.param_adj = adj_parametor
@@ -136,7 +136,7 @@ class KL_Divergence():
 
 class Summary():
     def __init__(self,df):
-        self.df = df
+        self.df = df.copy()
 
     def run(self):
         df_input = self.df
