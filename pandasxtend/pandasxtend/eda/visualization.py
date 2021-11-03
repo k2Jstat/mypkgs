@@ -2,11 +2,13 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import scipy.stats as stats
 import warnings
 
 __all__ = [
     "AllPlot"
 ]
+
 class AllPlot():
     def __init__(self,df,yoko=3,bins_ = None,sample_size = None,adj_parametor = 1e-10):
         
@@ -32,39 +34,54 @@ class AllPlot():
         self.bins_ = bins_
         self.adj_parametor = adj_parametor
         
-    def Histgram(self):
+    def Histgram(self,yoko_ = 4,sampling = True):
         df = self.df
         col_numeric = self.col_numeric
         yoko = self.yoko
         bins_ = self.bins_
 
-        num_cols = len(col_numeric)
-        if (num_cols % yoko) != 0:
-            tate = (num_cols // yoko) + 1
-        else :
-            tate = (num_cols // yoko)
+        if (yoko % 2) != 0:
+            yoko = yoko_
+        
+        tate = len(col_numeric)//2 + 1
 
         fig, ax = plt.subplots(tate,yoko,tight_layout = True,figsize = (yoko * 5,tate * 3))
-
         for num,col_ in enumerate(col_numeric):
             try:
-                i,j = num // yoko,num % yoko  
-                if tate == 1:
-                    #ax[j].grid(axis = "y")
-                    ax[j].hist(df[col_],bins = bins_,ec = "black")   
-                    ax[j].set_title(col_)
-                    
-                elif yoko == 1:
-                    #ax[i].grid(axis = "y")
-                    ax[i].hist(df[col_],bins = bins_,ec = "black")
-                    ax[i].set_title(col_)
-            
+                mod_ = num % 2
+                if mod_ == 0:
+                    j1,j2 = 0,1
                 else :
-                    #ax[i][j].grid(axis = "y")
-                    ax[i][j].hist(df[col_],bins = bins_,ec = "black")
-                    ax[i][j].set_title(col_)
+                    j1,j2 = 2,3
 
-            except :
+                i = num // 2   
+
+                temp = df[col_].copy()
+
+                #qqplotのためのサンプリング
+                if sampling == True:
+                    if temp.shape[0] >= 100000:
+                        temp2 = temp.sample(100000,random_state=71)
+                    else :
+                        temp2 = temp.copy()     
+                else :
+                    temp2 = temp.copy()
+
+                if tate == 1:
+                    ax[j1].hist(temp,bins = bins_,ec = "black")   
+                    stats.probplot(temp2, dist="norm", plot=ax[j2],fit = False)
+
+                    ax[j1].set_title("{} histgram".format(str(col_)))
+                    ax[j2].set_title("{} normal distribution qqplot".format(str(col_)))        
+
+                else :
+                    ax[i][j1].hist(temp,bins = bins_,ec = "black")   
+                    stats.probplot(temp2, dist="norm", plot=ax[i][j2],fit = False)
+
+                    ax[i][j1].set_title("{} histgram".format(str(col_)))
+                    ax[i][j2].set_title("{} normal distribution qqplot".format(str(col_)))
+
+            except:
                 None
 
         plt.show()
