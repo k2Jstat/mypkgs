@@ -26,7 +26,7 @@ class LGBCV():
                 #"bagging_seed":seed_
             }
             
-        lgb_params["bagging_seed"] = seed_
+        lgb_params_["bagging_seed"] = seed_
         
         self.lgb_params_ = lgb_params_
         self.kf = kf
