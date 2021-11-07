@@ -25,7 +25,7 @@ console_scripts = [
 
 setup(
     name='modelingset',
-    version='0.0.1',
+    version='0.0.2',
     packages=packages,
     #install_requires=install_requires,
     entry_points={'console_scripts': console_scripts},
