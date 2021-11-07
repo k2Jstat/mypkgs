@@ -5,10 +5,10 @@ from sklearn.model_selection import KFold
 from sklearn.preprocessing import LabelEncoder
 
 __all__ = [
-    "Encoder",
+    "CategoricalEncoder",
 ]
 
-class Encoder():
+class CategoricalEncoder():
     def __init__(self,X_train,y_train = None,X_test = None,y_test = None,random_state_ = 71):
         self.X_train = X_train
         self.X_test = X_test
@@ -19,7 +19,7 @@ class Encoder():
         self.feature_cat = feature_cat
         self.random_state_ = random_state_
     
-    def LabelEncoding(self,feature_label = "le"):
+    def LabelEncoding(self,feature_label = "LE"):
         X_train = self.X_train
         X_test = self.X_test
         feature_cat = self.feature_cat
@@ -45,7 +45,7 @@ class Encoder():
         if X_test is not None:
             self.le_test = le_test
 
-    def FrequencyEncoding(self,feature_label = "fe"):
+    def FrequencyEncoding(self,feature_label = "FE"):
         X_train = self.X_train
         X_test = self.X_test
         feature_cat = self.feature_cat
@@ -81,7 +81,7 @@ class Encoder():
         if X_test is not None:
             self.fe_test = fe_test
 
-    def TargetEncodingCV(self,feature_label = "te",target_stat = "mean",min_samples_leaf = 1,smoothing = 1,noise_level = 0,
+    def TargetEncodingCV(self,feature_label = "TE",target_stat = "mean",min_samples_leaf = 1,smoothing = 1,noise_level = 0,
                          kf = KFold(n_splits = 4,shuffle=True,random_state = 71)):
         X_train = self.X_train
         X_test = self.X_test
@@ -111,11 +111,12 @@ class Encoder():
                 temp[idx2] = te_train[col].iloc[idx2].map(target_encode_smoothed).fillna(prior)
                 #add noise
                 temp[idx2] = temp[idx2] * (1 + noise_level * np.random.randn(len(temp[idx2])))
-
                 col_name_te =col + "_{}_{}_{}".format(feature_label,target_stat,i+1) 
-                te_test[col_name_te] = te_test[col].map(target_encode).fillna(prior)
-                #add noise
-                te_test[col_name_te] = te_test[col_name_te] * (1 + noise_level * np.random.randn(len(te_test)))
+                    
+                if X_test is not None:
+                    te_test[col_name_te] = te_test[col].map(target_encode).fillna(prior)
+                    #add noise
+                    te_test[col_name_te] = te_test[col_name_te] * (1 + noise_level * np.random.randn(len(te_test)))
 
                 te_df[col] = target_encode.index
                 te_df[col_name_te] = target_encode.values
@@ -123,7 +124,10 @@ class Encoder():
             col_train_te = col + "_{}_{}".format(feature_label,target_stat)
             te_train.loc[:,col_train_te] = temp
             col_te_cv = [col for col in te_df.columns if col.find(col_train_te) > -1]
-            te_test.loc[:,col + "_{}_{}".format(feature_label,target_stat)] = te_test[col_te_cv].mean(axis = 1)
+            
+            if X_test is not None:
+                te_test.loc[:,col + "_{}_{}".format(feature_label,target_stat)] = te_test[col_te_cv].mean(axis = 1)
+            
             te_df.loc[:,col + "_{}_{}".format(feature_label,target_stat)] = te_df[col_te_cv].mean(axis = 1)
 
         col_feat_te = [col for col in te_train.columns if col.find("_{}_{}".format(feature_label,target_stat)) > -1]
