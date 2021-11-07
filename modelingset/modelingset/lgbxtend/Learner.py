@@ -145,7 +145,7 @@ class LGBCV():
         importance_df = self.importance_df
 
         col_top = importance_df.index[:num_top]
-        temp2 = temp.iloc[:,:-2]
+        temp2 = importance_df.iloc[:,:-2]
         plot_df = pd.DataFrame()
 
         for col in temp2.columns:
